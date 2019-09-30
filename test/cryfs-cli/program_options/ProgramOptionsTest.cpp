@@ -127,6 +127,16 @@ TEST_F(ProgramOptionsTest, AllowIntegrityViolationsTrue) {
     EXPECT_TRUE(testobj.allowIntegrityViolations());
 }
 
+TEST_F(ProgramOptionsTest, Relatime) {
+    ProgramOptions testobj("", "", none, true, false, false, none, none, none, none, false, none, cryfs::fsblobstore::TimestampUpdateBehavior::RELATIME, {"./myExecutable"});
+    EXPECT_EQ(cryfs::fsblobstore::TimestampUpdateBehavior::RELATIME, testobj.timestampUpdateBehavior());
+}
+
+TEST_F(ProgramOptionsTest, Noatime) {
+    ProgramOptions testobj("", "", none, true, false, false, none, none, none, none, false, none, cryfs::fsblobstore::TimestampUpdateBehavior::NOATIME, {"./myExecutable"});
+    EXPECT_EQ(cryfs::fsblobstore::TimestampUpdateBehavior::NOATIME, testobj.timestampUpdateBehavior());
+}
+
 TEST_F(ProgramOptionsTest, EmptyFuseOptions) {
     ProgramOptions testobj("/rootDir", "/home/user/mydir", none, false, false, false, none, none, none, none, false, none, cryfs::fsblobstore::TimestampUpdateBehavior::RELATIME, {});
     //Fuse should have the mount dir as first parameter
