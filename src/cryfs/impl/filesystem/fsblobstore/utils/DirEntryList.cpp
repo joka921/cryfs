@@ -251,7 +251,7 @@ bool DirEntryList::updateAccessTimestampForChild(const blockstore::BlockId &bloc
             }
             break;
         case TimestampUpdateBehavior::NOATIME:
-            changed = false;
+            // Don't update timestamps
             break;
         default:  /* should never be reached */
             ASSERT(false, "timestampUpdateBehavior somehow got a value other than RELATIME or NOATIME");
