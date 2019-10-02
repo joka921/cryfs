@@ -69,9 +69,8 @@ public:
         value_ = std::move(rhs.value_);
         return *this;
     }
-    constexpr IdValueType& operator=(const IdValueType& rhs) noexcept(noexcept(*std::declval<UnderlyingType*>() = rhs.value_)) {
-        value_ = rhs.value_;
-        return *this;
+    constexpr IdValueType& operator=(const IdValueType& rhs) noexcept(noexcept(operator=(IdValueType(rhs)))) {
+        return operator=(IdValueType(rhs));
     }
 
 protected:

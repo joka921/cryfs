@@ -21,19 +21,19 @@ using namespace blockstore;
 class BlockStoreMock: public BlockStore {
 public:
     MOCK_METHOD0(createBlockId, BlockId());
-    optional<unique_ref<Block>> tryCreate(const BlockId &blockId, Data data) {
+    optional<unique_ref<Block>> tryCreate(const BlockId &blockId, Data data) override {
         return cpputils::nullcheck(std::unique_ptr<Block>(do_create(blockId, data)));
     }
     MOCK_METHOD2(do_create, Block*(const BlockId &, const Data &data));
-    unique_ref<Block> overwrite(const BlockId &blockId, Data data) {
+    unique_ref<Block> overwrite(const BlockId &blockId, Data data) override {
         return cpputils::nullcheck(std::unique_ptr<Block>(do_overwrite(blockId, data))).value();
     }
     MOCK_METHOD2(do_overwrite, Block*(const BlockId &, const Data &data));
-    optional<unique_ref<Block>> load(const BlockId &blockId) {
+    optional<unique_ref<Block>> load(const BlockId &blockId) override {
         return cpputils::nullcheck(std::unique_ptr<Block>(do_load(blockId)));
     }
     MOCK_METHOD1(do_load, Block*(const BlockId &));
-    void remove(unique_ref<Block> block) {UNUSED(block);}
+    void remove(unique_ref<Block> block) override {UNUSED(block);}
     MOCK_METHOD1(remove, void(const BlockId &));
     MOCK_CONST_METHOD0(numBlocks, uint64_t());
     MOCK_CONST_METHOD0(estimateNumFreeBytes, uint64_t());
