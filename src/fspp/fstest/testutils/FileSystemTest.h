@@ -97,11 +97,37 @@ public:
   void setModificationTimestampLaterThanAccessTimestamp(const boost::filesystem::path& path) {
     auto node = device->Load(path).value();
     auto st = node->stat();
-    st.mtime.tv_nsec = st.mtime.tv_nsec + 1;
+    st.mtime.tv_nsec = st.atime.tv_nsec + 1;
     node->utimens(
             st.atime,
             st.mtime
     );
+  }
+
+  void setModificationTimestampOlderThanAccessTimestamp(const boost::filesystem::path& path) {
+    auto node = device->Load(path).value();
+    auto st = node->stat();
+    st.mtime.tv_nsec = st.atime.tv_nsec - 1;
+    node->utimens(
+            st.atime,
+            st.mtime
+    );
+  }
+
+  void setAccessTimestampBeforeYesterday(const boost::filesystem::path& path) {
+      auto node = device->Load(path).value();
+      auto st = node->stat();
+      const timespec now = cpputils::time::now();
+      const timespec before_yesterday {
+              /*.tv_sec = */ now.tv_sec - 60*60*24 - 1,
+              /*.tv_nsec = */ now.tv_nsec
+      };
+      st.atime = before_yesterday;
+      st.mtime.tv_nsec = st.atime.tv_nsec - 1;
+      node->utimens(
+              st.atime,
+              st.mtime
+      );
   }
 };
 template<class ConcreteFileSystemTestFixture> constexpr fspp::mode_t FileSystemTest<ConcreteFileSystemTestFixture>::MODE_PUBLIC;

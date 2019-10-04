@@ -20,6 +20,10 @@ public:
     static TimestampUpdateExpectation ExpectDoesntUpdateMetadataTimestamp;
     static TimestampUpdateExpectation ExpectDoesntUpdateAnyTimestamps;
 
+    void setTimestampUpdateBehavior(fspp::TimestampUpdateBehavior timestampUpdateBehavior) {
+        FileSystemTest<ConcreteFileSystemTestFixture>::device->setContext(fspp::Context { timestampUpdateBehavior });
+    }
+
     void EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(std::function<fspp::Node::stat_info()> statOld, std::function<fspp::Node::stat_info()> statNew, std::function<void()> operation, std::initializer_list<TimestampUpdateExpectation> behaviorChecks) {
         auto oldStat = statOld();
         ensureNodeTimestampsAreOld(oldStat);

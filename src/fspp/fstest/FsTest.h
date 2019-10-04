@@ -22,7 +22,8 @@
   INSTANTIATE_TYPED_TEST_CASE_P(FS_NAME, FsppDeviceTest_Two,             FIXTURE);  \
   INSTANTIATE_NODE_TEST_CASE(   FS_NAME, FsppDeviceTest_Timestamps,      FIXTURE);  \
   INSTANTIATE_TYPED_TEST_CASE_P(FS_NAME, FsppDirTest,                    FIXTURE);  \
-  INSTANTIATE_TYPED_TEST_CASE_P(FS_NAME, FsppDirTest_Timestamps,         FIXTURE);  \
+  INSTANTIATE_TYPED_TEST_CASE_P(FS_NAME, FsppDirTest_Timestamps_1,       FIXTURE);  \
+  INSTANTIATE_TYPED_TEST_CASE_P(FS_NAME, FsppDirTest_Timestamps_2,       FIXTURE);  \
   INSTANTIATE_NODE_TEST_CASE(   FS_NAME, FsppDirTest_Timestamps_Entries, FIXTURE);  \
   INSTANTIATE_TYPED_TEST_CASE_P(FS_NAME, FsppFileTest,                   FIXTURE);  \
   INSTANTIATE_TYPED_TEST_CASE_P(FS_NAME, FsppFileTest_Timestamps,        FIXTURE);  \
