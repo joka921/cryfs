@@ -314,26 +314,41 @@ void Fuse::_createContext(const vector<string> &fuseOptions) {
     const bool has_noatime_flag = fuseOptions.end() != std::find(fuseOptions.begin(), fuseOptions.end(), "noatime");
     const bool has_relatime_flag = fuseOptions.end() != std::find(fuseOptions.begin(), fuseOptions.end(), "relatime");
     const bool has_strictatime_flag = fuseOptions.end() != std::find(fuseOptions.begin(), fuseOptions.end(), "strictatime");
-    ASSERT(!(has_atime_flag && has_noatime_flag), "Cannot have both, atime and noatime flags set.");
-    ASSERT(!(has_atime_flag && has_relatime_flag), "Cannot have both, atime and relatime flags set.");
-    ASSERT(!(has_atime_flag && has_strictatime_flag), "Cannot have both, atime and strictatime flags set.");
-    ASSERT(!(has_noatime_flag && has_relatime_flag), "Cannot have both, noatime and relatime flags set.");
-    ASSERT(!(has_noatime_flag && has_strictatime_flag), "Cannot have both, noatime and strictatime flags set.");
-    ASSERT(!(has_relatime_flag && has_strictatime_flag), "Cannot have both, relatime and strictatime flags set.");
+    const bool has_nodiratime_flag = fuseOptions.end() != std::find(fuseOptions.begin(), fuseOptions.end(), "nodiratime");
 
     // Default is RELATIME
-    _context = Context(TimestampUpdateBehavior::RELATIME);
+    _context = Context(relatime());
 
-    if (has_atime_flag) {
-        // atime on linux seems to be an alias for relatime
-        _context->setTimestampUpdateBehavior(TimestampUpdateBehavior::RELATIME);
-    } else if (has_noatime_flag) {
-        _context->setTimestampUpdateBehavior(TimestampUpdateBehavior::NOATIME);
-    } else if (has_relatime_flag) {
-        _context->setTimestampUpdateBehavior(TimestampUpdateBehavior::RELATIME);
+    if (has_noatime_flag) {
+        ASSERT(!has_atime_flag, "Cannot have both, noatime and atime flags set.");
+        ASSERT(!has_relatime_flag, "Cannot have both, noatime and relatime flags set.");
+        ASSERT(!has_strictatime_flag, "Cannot have both, noatime and strictatime flags set.");
+        // note: can have nodiratime flag set but that is ignored because it is already included in the noatime policy.
+        _context->setTimestampUpdateBehavior(noatime());
+    } else if (has_relatime_flag || has_atime_flag) {
+        // note: can have atime and relatime both set, they're identical
+        ASSERT(!has_noatime_flag, "Cannot have both, noatime and relatime flags set.");
+        ASSERT(!has_strictatime_flag, "Cannot have both, noatime and strictatime flags set.");
+        if (has_nodiratime_flag) {
+            _context->setTimestampUpdateBehavior(nodiratime_relatime());
+        } else {
+            _context->setTimestampUpdateBehavior(relatime());
+        }
     } else if (has_strictatime_flag) {
-        LOG(WARN, "CryFS currently doesn't support strictatime flag. Possible behaviors are relatime (default) and noatime.");
-        // TODO context.setTimestampUpdateBehavior(TimestampUpdateBehavior::STRICTATIME);
+        ASSERT(!has_noatime_flag, "Cannot have both, strictatime and noatime flags set.");
+        ASSERT(!has_atime_flag, "Cannot have both, strictatime and atime flags set.");
+        ASSERT(!has_relatime_flag, "Cannot have both, strictatime and relatime flags set.");
+        if (has_nodiratime_flag) {
+            _context->setTimestampUpdateBehavior(nodiratime_strictatime());
+        } else {
+            _context->setTimestampUpdateBehavior(strictatime());
+        }
+    } else if (has_nodiratime_flag) {
+        ASSERT(!has_noatime_flag, "This shouldn't happen, or we would have hit a case above");
+        ASSERT(!has_atime_flag, "This shouldn't happen, or we would have hit a case above");
+        ASSERT(!has_relatime_flag, "This shouldn't happen, or we would have hit a case above");
+        ASSERT(!has_strictatime_flag, "This shouldn't happen, or we would have hit a case above");
+        _context->setTimestampUpdateBehavior(nodiratime_relatime()); // use relatime by default
     }
 }
 

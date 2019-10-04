@@ -32,7 +32,7 @@ public:
 
   FileSystemTest(): fixture(), device(fixture.createDevice()) {
       // TODO How should timestamp tests set this?
-      device->setContext(fspp::Context{fspp::TimestampUpdateBehavior::RELATIME});
+      device->setContext(fspp::Context{fspp::relatime()});
   }
 
   ConcreteFileSystemTestFixture fixture;

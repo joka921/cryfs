@@ -229,36 +229,29 @@ void DirEntryList::setAccessTimes(const blockstore::BlockId &blockId, timespec l
 }
 
 bool DirEntryList::updateAccessTimestampForChild(const blockstore::BlockId &blockId, fspp::TimestampUpdateBehavior timestampUpdateBehavior) {
-    ASSERT( timestampUpdateBehavior == fspp::TimestampUpdateBehavior::RELATIME || timestampUpdateBehavior == fspp::TimestampUpdateBehavior::NOATIME
-          , "Currently only relatime or noatime supported");
-
     auto found = _findById(blockId);
+
     const timespec lastAccessTime = found->lastAccessTime();
     const timespec lastModificationTime = found->lastModificationTime();
     const timespec now = cpputils::time::now();
-    const timespec yesterday {
-        /*.tv_sec = */ now.tv_sec - 60*60*24,
-        /*.tv_nsec = */ now.tv_nsec
-    };
 
-    bool changed = false;
-
-    switch(timestampUpdateBehavior) {
-        case fspp::TimestampUpdateBehavior::RELATIME:
-            if (lastAccessTime < lastModificationTime || lastAccessTime < yesterday) {
+    switch (found->type()) {
+        case fspp::Dir::EntryType::FILE:
+            // fallthrough
+        case fspp::Dir::EntryType::SYMLINK:
+            if (timestampUpdateBehavior->shouldUpdateATimeOnFileRead(lastAccessTime, lastModificationTime, now)) {
                 found->setLastAccessTime(now);
-                changed = true;
+                return true;
             }
-            break;
-        case fspp::TimestampUpdateBehavior::NOATIME:
-            // Don't update timestamps
-            break;
-        default:  /* should never be reached */
-            ASSERT(false, "timestampUpdateBehavior somehow got a value other than RELATIME or NOATIME");
-            break;
+            return false;
+        case fspp::Dir::EntryType::DIR:
+            if (timestampUpdateBehavior->shouldUpdateATimeOnDirectoryRead(lastAccessTime, lastModificationTime, now)) {
+                found->setLastAccessTime(now);
+                return true;
+            }
+            return false;
     }
-
-    return changed;
+    throw std::logic_error("Unhandled case");
 }
 
 void DirEntryList::updateModificationTimestampForChild(const blockstore::BlockId &blockId) {
