@@ -302,9 +302,39 @@ void Fuse::_run(const bf::path &mountdir, const vector<string> &fuseOptions) {
 
   ASSERT(_argv.size() == 0, "Filesystem already started");
 
+  _createContext(fuseOptions);
+
   _argv = _build_argv(mountdir, fuseOptions);
 
   fuse_main(_argv.size(), _argv.data(), operations(), this);
+}
+
+void Fuse::_createContext(const vector<string> &fuseOptions) {
+    const bool has_atime_flag = fuseOptions.end() != std::find(fuseOptions.begin(), fuseOptions.end(), "atime");
+    const bool has_noatime_flag = fuseOptions.end() != std::find(fuseOptions.begin(), fuseOptions.end(), "noatime");
+    const bool has_relatime_flag = fuseOptions.end() != std::find(fuseOptions.begin(), fuseOptions.end(), "relatime");
+    const bool has_strictatime_flag = fuseOptions.end() != std::find(fuseOptions.begin(), fuseOptions.end(), "strictatime");
+    ASSERT(!(has_atime_flag && has_noatime_flag), "Cannot have both, atime and noatime flags set.");
+    ASSERT(!(has_atime_flag && has_relatime_flag), "Cannot have both, atime and relatime flags set.");
+    ASSERT(!(has_atime_flag && has_strictatime_flag), "Cannot have both, atime and strictatime flags set.");
+    ASSERT(!(has_noatime_flag && has_relatime_flag), "Cannot have both, noatime and relatime flags set.");
+    ASSERT(!(has_noatime_flag && has_strictatime_flag), "Cannot have both, noatime and strictatime flags set.");
+    ASSERT(!(has_relatime_flag && has_strictatime_flag), "Cannot have both, relatime and strictatime flags set.");
+
+    // Default is RELATIME
+    _context = Context(TimestampUpdateBehavior::RELATIME);
+
+    if (has_atime_flag) {
+        // atime on linux seems to be an alias for relatime
+        _context->setTimestampUpdateBehavior(TimestampUpdateBehavior::RELATIME);
+    } else if (has_noatime_flag) {
+        _context->setTimestampUpdateBehavior(TimestampUpdateBehavior::NOATIME);
+    } else if (has_relatime_flag) {
+        _context->setTimestampUpdateBehavior(TimestampUpdateBehavior::RELATIME);
+    } else if (has_strictatime_flag) {
+        LOG(WARN, "CryFS currently doesn't support strictatime flag. Possible behaviors are relatime (default) and noatime.");
+        // TODO context.setTimestampUpdateBehavior(TimestampUpdateBehavior::STRICTATIME);
+    }
 }
 
 vector<char *> Fuse::_build_argv(const bf::path &mountdir, const vector<string> &fuseOptions) {
@@ -1099,6 +1129,9 @@ void Fuse::init(fuse_conn_info *conn) {
   UNUSED(conn);
   ThreadNameForDebugging _threadName("init");
   _fs = _init(this);
+
+  ASSERT(_context.has_value(), "Context should have been initialized in Fuse::run() but somehow didn't");
+  _fs->setContext(fspp::Context { *_context });
 
   LOG(INFO, "Filesystem started.");
 

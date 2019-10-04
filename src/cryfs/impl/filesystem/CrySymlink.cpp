@@ -4,7 +4,6 @@
 #include "CryDevice.h"
 #include "CrySymlink.h"
 #include "cryfs/impl/filesystem/parallelaccessfsblobstore/SymlinkBlobRef.h"
-#include "cryfs/impl/filesystem/fsblobstore/utils/TimestampUpdateBehavior.h"
 
 //TODO Get rid of this in favor of exception hierarchy
 
@@ -22,8 +21,8 @@ using cryfs::parallelaccessfsblobstore::DirBlobRef;
 
 namespace cryfs {
 
-CrySymlink::CrySymlink(CryDevice *device, unique_ref<DirBlobRef> parent, optional<unique_ref<DirBlobRef>> grandparent, const BlockId &blockId, fsblobstore::TimestampUpdateBehavior timestampUpdateBehavior)
-: CryNode(device, std::move(parent), std::move(grandparent), blockId, timestampUpdateBehavior) {
+CrySymlink::CrySymlink(CryDevice *device, unique_ref<DirBlobRef> parent, optional<unique_ref<DirBlobRef>> grandparent, const BlockId &blockId)
+: CryNode(device, std::move(parent), std::move(grandparent), blockId) {
 }
 
 CrySymlink::~CrySymlink() {

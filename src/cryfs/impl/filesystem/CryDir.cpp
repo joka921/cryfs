@@ -9,7 +9,6 @@
 #include "CryFile.h"
 #include "CryOpenFile.h"
 #include <cpp-utils/system/time.h>
-#include "cryfs/impl/filesystem/fsblobstore/utils/TimestampUpdateBehavior.h"
 
 //TODO Get rid of this in favor of exception hierarchy
 using fspp::fuse::FuseErrnoException;
@@ -29,8 +28,8 @@ using cryfs::parallelaccessfsblobstore::DirBlobRef;
 
 namespace cryfs {
 
-CryDir::CryDir(CryDevice *device, optional<unique_ref<DirBlobRef>> parent, optional<unique_ref<DirBlobRef>> grandparent, const BlockId &blockId, fsblobstore::TimestampUpdateBehavior timestampUpdateBehavior)
-: CryNode(device, std::move(parent), std::move(grandparent), blockId, timestampUpdateBehavior) {
+CryDir::CryDir(CryDevice *device, optional<unique_ref<DirBlobRef>> parent, optional<unique_ref<DirBlobRef>> grandparent, const BlockId &blockId)
+: CryNode(device, std::move(parent), std::move(grandparent), blockId) {
 }
 
 CryDir::~CryDir() {

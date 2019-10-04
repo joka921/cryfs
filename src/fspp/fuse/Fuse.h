@@ -12,6 +12,7 @@
 #include <cpp-utils/macros.h>
 #include <atomic>
 #include "stat_compatibility.h"
+#include <fspp/fs_interface/Context.h>
 
 namespace fspp {
 class Device;
@@ -72,6 +73,7 @@ private:
   static bool _has_entry_with_prefix(const std::string &prefix, const std::vector<char *> &vec);
   std::vector<char *> _build_argv(const boost::filesystem::path &mountdir, const std::vector<std::string> &fuseOptions);
   void _add_fuse_option_if_not_exists(std::vector<char *> *argv, const std::string &key, const std::string &value);
+  void _createContext(const std::vector<std::string> &fuseOptions);
 
   std::function<std::shared_ptr<Filesystem> (Fuse *fuse)> _init;
   std::function<void()> _onMounted;
@@ -81,6 +83,7 @@ private:
   std::atomic<bool> _running;
   std::string _fstype;
   boost::optional<std::string> _fsname;
+  boost::optional<Context> _context;
 
   DISALLOW_COPY_AND_ASSIGN(Fuse);
 };

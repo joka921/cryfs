@@ -228,8 +228,8 @@ void DirEntryList::setAccessTimes(const blockstore::BlockId &blockId, timespec l
     found->setLastModificationTime(lastModificationTime);
 }
 
-bool DirEntryList::updateAccessTimestampForChild(const blockstore::BlockId &blockId, TimestampUpdateBehavior timestampUpdateBehavior) {
-    ASSERT( timestampUpdateBehavior == TimestampUpdateBehavior::RELATIME || timestampUpdateBehavior == TimestampUpdateBehavior::NOATIME
+bool DirEntryList::updateAccessTimestampForChild(const blockstore::BlockId &blockId, fspp::TimestampUpdateBehavior timestampUpdateBehavior) {
+    ASSERT( timestampUpdateBehavior == fspp::TimestampUpdateBehavior::RELATIME || timestampUpdateBehavior == fspp::TimestampUpdateBehavior::NOATIME
           , "Currently only relatime or noatime supported");
 
     auto found = _findById(blockId);
@@ -244,13 +244,13 @@ bool DirEntryList::updateAccessTimestampForChild(const blockstore::BlockId &bloc
     bool changed = false;
 
     switch(timestampUpdateBehavior) {
-        case TimestampUpdateBehavior::RELATIME:
+        case fspp::TimestampUpdateBehavior::RELATIME:
             if (lastAccessTime < lastModificationTime || lastAccessTime < yesterday) {
                 found->setLastAccessTime(now);
                 changed = true;
             }
             break;
-        case TimestampUpdateBehavior::NOATIME:
+        case fspp::TimestampUpdateBehavior::NOATIME:
             // Don't update timestamps
             break;
         default:  /* should never be reached */

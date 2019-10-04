@@ -1,0 +1,12 @@
+#pragma once
+
+#ifndef MESSMER_FSPP_TIMESTAMPUPDATEBEHAVIOR_H
+#define MESSMER_FSPP_TIMESTAMPUPDATEBEHAVIOR_H
+
+namespace fspp {
+
+
+
+}
+
+#endif

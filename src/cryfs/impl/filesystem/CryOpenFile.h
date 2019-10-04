@@ -5,14 +5,13 @@
 #include <fspp/fs_interface/OpenFile.h>
 #include "cryfs/impl/filesystem/parallelaccessfsblobstore/FileBlobRef.h"
 #include "cryfs/impl/filesystem/parallelaccessfsblobstore/DirBlobRef.h"
-#include "cryfs/impl/filesystem/fsblobstore/utils/TimestampUpdateBehavior.h"
 
 namespace cryfs {
 class CryDevice;
 
 class CryOpenFile final: public fspp::OpenFile {
 public:
-  explicit CryOpenFile(const CryDevice *device, std::shared_ptr<parallelaccessfsblobstore::DirBlobRef> parent, cpputils::unique_ref<parallelaccessfsblobstore::FileBlobRef> fileBlob, fsblobstore::TimestampUpdateBehavior timestampUpdateBehavior);
+  explicit CryOpenFile(const CryDevice *device, std::shared_ptr<parallelaccessfsblobstore::DirBlobRef> parent, cpputils::unique_ref<parallelaccessfsblobstore::FileBlobRef> fileBlob, fspp::TimestampUpdateBehavior timestampUpdateBehavior);
   ~CryOpenFile();
 
   stat_info stat() const override;
@@ -22,13 +21,13 @@ public:
   void flush() override;
   void fsync() override;
   void fdatasync() override;
-  fsblobstore::TimestampUpdateBehavior timestampUpdateBehavior() const;
+  fspp::TimestampUpdateBehavior timestampUpdateBehavior() const;
 
 private:
   const CryDevice *_device;
   std::shared_ptr<parallelaccessfsblobstore::DirBlobRef> _parent;
   cpputils::unique_ref<parallelaccessfsblobstore::FileBlobRef> _fileBlob;
-  fsblobstore::TimestampUpdateBehavior _timestampUpdateBehavior;
+  fspp::TimestampUpdateBehavior _timestampUpdateBehavior;
 
   DISALLOW_COPY_AND_ASSIGN(CryOpenFile);
 };

@@ -30,7 +30,10 @@ public:
     "Given test fixture for instantiating the (type parameterized) FileSystemTest must inherit from FileSystemTestFixture"
   );
 
-  FileSystemTest(): fixture(), device(fixture.createDevice()) {}
+  FileSystemTest(): fixture(), device(fixture.createDevice()) {
+      // TODO How should timestamp tests set this?
+      device->setContext(fspp::Context{fspp::TimestampUpdateBehavior::RELATIME});
+  }
 
   ConcreteFileSystemTestFixture fixture;
   cpputils::unique_ref<fspp::Device> device;

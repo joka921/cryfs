@@ -5,7 +5,6 @@
 
 #include "CryDevice.h"
 #include <fspp/fs_interface/FuseErrnoException.h>
-#include "cryfs/impl/filesystem/fsblobstore/utils/TimestampUpdateBehavior.h"
 
 
 using std::shared_ptr;
@@ -17,7 +16,7 @@ using cryfs::parallelaccessfsblobstore::DirBlobRef;
 
 namespace cryfs {
 
-CryOpenFile::CryOpenFile(const CryDevice *device, shared_ptr<DirBlobRef> parent, unique_ref<FileBlobRef> fileBlob, fsblobstore::TimestampUpdateBehavior timestampUpdateBehavior)
+CryOpenFile::CryOpenFile(const CryDevice *device, shared_ptr<DirBlobRef> parent, unique_ref<FileBlobRef> fileBlob, fspp::TimestampUpdateBehavior timestampUpdateBehavior)
 : _device(device), _parent(parent), _fileBlob(std::move(fileBlob)), _timestampUpdateBehavior(timestampUpdateBehavior) {
 }
 
@@ -65,7 +64,7 @@ void CryOpenFile::fdatasync() {
   _fileBlob->flush();
 }
 
-fsblobstore::TimestampUpdateBehavior CryOpenFile::timestampUpdateBehavior() const {
+fspp::TimestampUpdateBehavior CryOpenFile::timestampUpdateBehavior() const {
   return _timestampUpdateBehavior;
 }
 

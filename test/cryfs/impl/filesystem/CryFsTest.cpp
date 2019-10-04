@@ -7,7 +7,6 @@
 #include <cryfs/impl/filesystem/CryDir.h>
 #include <cryfs/impl/filesystem/CryFile.h>
 #include <cryfs/impl/filesystem/CryOpenFile.h>
-#include <cryfs/impl/filesystem/fsblobstore/utils/TimestampUpdateBehavior.h>
 #include "../testutils/MockConsole.h"
 #include <cryfs/impl/config/CryConfigLoader.h>
 #include <cryfs/impl/config/CryPresetPasswordBasedKeyProvider.h>
@@ -65,20 +64,24 @@ auto failOnIntegrityViolation() {
 
 TEST_F(CryFsTest, CreatedRootdirIsLoadableAfterClosing) {
   {
-    CryDevice dev(loadOrCreateConfig(), blockStore(), localStateDir, 0x12345678, false, false, failOnIntegrityViolation(), fsblobstore::TimestampUpdateBehavior::RELATIME);
+    CryDevice dev(loadOrCreateConfig(), blockStore(), localStateDir, 0x12345678, false, false, failOnIntegrityViolation());
+    dev.setContext(fspp::Context {fspp::TimestampUpdateBehavior::RELATIME});
   }
-  CryDevice dev(loadOrCreateConfig(), blockStore(), localStateDir, 0x12345678, false, false, failOnIntegrityViolation(), fsblobstore::TimestampUpdateBehavior::RELATIME);
+  CryDevice dev(loadOrCreateConfig(), blockStore(), localStateDir, 0x12345678, false, false, failOnIntegrityViolation());
+  dev.setContext(fspp::Context {fspp::TimestampUpdateBehavior::RELATIME});
   auto rootDir = dev.LoadDir(bf::path("/"));
   rootDir.value()->children();
 }
 
 TEST_F(CryFsTest, LoadingFilesystemDoesntModifyConfigFile) {
   {
-    CryDevice dev(loadOrCreateConfig(), blockStore(), localStateDir, 0x12345678, false, false, failOnIntegrityViolation(), fsblobstore::TimestampUpdateBehavior::RELATIME);
+    CryDevice dev(loadOrCreateConfig(), blockStore(), localStateDir, 0x12345678, false, false, failOnIntegrityViolation());
+    dev.setContext(fspp::Context {fspp::TimestampUpdateBehavior::RELATIME});
   }
   Data configAfterCreating = Data::LoadFromFile(config.path()).value();
   {
-    CryDevice dev(loadOrCreateConfig(), blockStore(), localStateDir, 0x12345678, false, false, failOnIntegrityViolation(), fsblobstore::TimestampUpdateBehavior::RELATIME);
+    CryDevice dev(loadOrCreateConfig(), blockStore(), localStateDir, 0x12345678, false, false, failOnIntegrityViolation());
+    dev.setContext(fspp::Context {fspp::TimestampUpdateBehavior::RELATIME});
   }
   Data configAfterLoading = Data::LoadFromFile(config.path()).value();
   EXPECT_EQ(configAfterCreating, configAfterLoading);

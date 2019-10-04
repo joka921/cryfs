@@ -21,7 +21,6 @@
 #include <blockstore/interface/BlockStore2.h>
 #include "cryfs/impl/localstate/LocalStateDir.h"
 #include <cryfs/impl/CryfsException.h>
-#include "cryfs/impl/filesystem/fsblobstore/utils/TimestampUpdateBehavior.h"
 
 
 using std::string;
@@ -55,10 +54,10 @@ namespace bf = boost::filesystem;
 
 namespace cryfs {
 
-CryDevice::CryDevice(std::shared_ptr<CryConfigFile> configFile, unique_ref<BlockStore2> blockStore, const LocalStateDir& localStateDir, uint32_t myClientId, bool allowIntegrityViolations, bool missingBlockIsIntegrityViolation, std::function<void()> onIntegrityViolation, fsblobstore::TimestampUpdateBehavior timestampUpdateBehavior)
+CryDevice::CryDevice(std::shared_ptr<CryConfigFile> configFile, unique_ref<BlockStore2> blockStore, const LocalStateDir& localStateDir, uint32_t myClientId, bool allowIntegrityViolations, bool missingBlockIsIntegrityViolation, std::function<void()> onIntegrityViolation)
 : _fsBlobStore(CreateFsBlobStore(std::move(blockStore), configFile.get(), localStateDir, myClientId, allowIntegrityViolations, missingBlockIsIntegrityViolation, std::move(onIntegrityViolation))),
   _rootBlobId(GetOrCreateRootBlobId(configFile.get())), _configFile(std::move(configFile)),
-  _onFsAction(), _timestampUpdateBehavior(timestampUpdateBehavior) {
+  _onFsAction() {
 }
 
 unique_ref<parallelaccessfsblobstore::ParallelAccessFsBlobStore> CryDevice::CreateFsBlobStore(unique_ref<BlockStore2> blockStore, CryConfigFile *configFile, const LocalStateDir& localStateDir, uint32_t myClientId, bool allowIntegrityViolations, bool missingBlockIsIntegrityViolation, std::function<void()> onIntegrityViolation) {
@@ -192,7 +191,7 @@ optional<unique_ref<fspp::Node>> CryDevice::Load(const bf::path &path) {
 
   if (path.parent_path().empty()) {
     //We are asked to load the base directory '/'.
-    return optional<unique_ref<fspp::Node>>(make_unique_ref<CryDir>(this, none, none, _rootBlobId, _timestampUpdateBehavior));
+    return optional<unique_ref<fspp::Node>>(make_unique_ref<CryDir>(this, none, none, _rootBlobId));
   }
 
   auto parentWithGrandparent = LoadDirBlobWithParent(path.parent_path());
@@ -207,11 +206,11 @@ optional<unique_ref<fspp::Node>> CryDevice::Load(const bf::path &path) {
 
   switch(entry.type()) {
     case fspp::Dir::EntryType::DIR:
-      return optional<unique_ref<fspp::Node>>(make_unique_ref<CryDir>(this, std::move(parent), std::move(grandparent), entry.blockId(), _timestampUpdateBehavior));
+      return optional<unique_ref<fspp::Node>>(make_unique_ref<CryDir>(this, std::move(parent), std::move(grandparent), entry.blockId()));
     case fspp::Dir::EntryType::FILE:
-      return optional<unique_ref<fspp::Node>>(make_unique_ref<CryFile>(this, std::move(parent), std::move(grandparent), entry.blockId(), _timestampUpdateBehavior));
+      return optional<unique_ref<fspp::Node>>(make_unique_ref<CryFile>(this, std::move(parent), std::move(grandparent), entry.blockId()));
     case  fspp::Dir::EntryType::SYMLINK:
-	  return optional<unique_ref<fspp::Node>>(make_unique_ref<CrySymlink>(this, std::move(parent), std::move(grandparent), entry.blockId(), _timestampUpdateBehavior));
+	  return optional<unique_ref<fspp::Node>>(make_unique_ref<CrySymlink>(this, std::move(parent), std::move(grandparent), entry.blockId()));
   }
   ASSERT(false, "Switch/case not exhaustive");
 }
