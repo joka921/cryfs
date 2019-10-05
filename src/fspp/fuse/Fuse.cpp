@@ -1145,7 +1145,7 @@ void Fuse::init(fuse_conn_info *conn) {
   ThreadNameForDebugging _threadName("init");
   _fs = _init(this);
 
-  ASSERT(_context.has_value(), "Context should have been initialized in Fuse::run() but somehow didn't");
+  ASSERT(_context != boost::none, "Context should have been initialized in Fuse::run() but somehow didn't");
   _fs->setContext(fspp::Context { *_context });
 
   LOG(INFO, "Filesystem started.");

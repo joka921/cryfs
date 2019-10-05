@@ -31,7 +31,7 @@ public:
 	virtual boost::optional<cpputils::unique_ref<Symlink>> LoadSymlink(const boost::filesystem::path &path) = 0;
 
     const Context& getContext() const {
-        ASSERT(_context.has_value(), "Tried to call getContext() but file system isn't running yet.");
+        ASSERT(_context != boost::none, "Tried to call getContext() but file system isn't running yet.");
         return *_context;
     }
 
