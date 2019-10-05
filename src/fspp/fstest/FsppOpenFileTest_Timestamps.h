@@ -107,7 +107,7 @@ TYPED_TEST_P(FsppOpenFileTest_Timestamps, truncate_nonempty_to_nonempty_grow) {
 TYPED_TEST_P(FsppOpenFileTest_Timestamps, givenAtimeNewerThanMtimeButBeforeYesterday_read_inbounds) {
     auto operation = [this] () {
         this->CreateFileWithSize("/myfile", fspp::num_bytes_t(10));
-        this->setAccessTimestampNewerThanMtimeButBeforeYesterday("/myfile");
+        this->setAtimeNewerThanMtimeButBeforeYesterday("/myfile");
         auto openFile = this->OpenFile("/myfile", fspp::num_bytes_t(10));
         auto* openFilePtr = openFile.get();
 
@@ -138,7 +138,7 @@ TYPED_TEST_P(FsppOpenFileTest_Timestamps, givenAtimeNewerThanMtimeButBeforeYeste
 TYPED_TEST_P(FsppOpenFileTest_Timestamps, givenAtimeNewerThanMtime_read_inbounds) {
     auto operation = [this] () {
         this->CreateFileWithSize("/myfile", fspp::num_bytes_t(10));
-        this->setModificationTimestampOlderThanAccessTimestamp("/myfile");
+        this->setAtimeNewerThanMtime("/myfile");
         auto openFile = this->OpenFile("/myfile", fspp::num_bytes_t(10));
         auto* openFilePtr = openFile.get();
 
@@ -169,7 +169,7 @@ TYPED_TEST_P(FsppOpenFileTest_Timestamps, givenAtimeNewerThanMtime_read_inbounds
 TYPED_TEST_P(FsppOpenFileTest_Timestamps, givenAtimeOlderThanMtime_read_inbounds) {
     auto operation = [this] () {
         this->CreateFileWithSize("/myfile", fspp::num_bytes_t(10));
-        this->setModificationTimestampLaterThanAccessTimestamp("/myfile");
+        this->setAtimeOlderThanMtime("/myfile");
         auto openFile = this->OpenFile("/myfile", fspp::num_bytes_t(10));
         auto* openFilePtr = openFile.get();
 
@@ -197,17 +197,10 @@ TYPED_TEST_P(FsppOpenFileTest_Timestamps, givenAtimeOlderThanMtime_read_inbounds
     });
 }
 
-
-
-
-
-
-
-
 TYPED_TEST_P(FsppOpenFileTest_Timestamps, givenAtimeNewerThanMtimeButBeforeYesterday_read_outofbounds) {
     auto operation = [this] () {
         this->CreateFileWithSize("/myfile", fspp::num_bytes_t(10));
-        this->setAccessTimestampNewerThanMtimeButBeforeYesterday("/myfile");
+        this->setAtimeNewerThanMtimeButBeforeYesterday("/myfile");
         auto openFile = this->OpenFile("/myfile", fspp::num_bytes_t(10));
         auto* openFilePtr = openFile.get();
 
@@ -238,7 +231,7 @@ TYPED_TEST_P(FsppOpenFileTest_Timestamps, givenAtimeNewerThanMtimeButBeforeYeste
 TYPED_TEST_P(FsppOpenFileTest_Timestamps, givenAtimeNewerThanMtime_read_outofbounds) {
     auto operation = [this] () {
         this->CreateFileWithSize("/myfile", fspp::num_bytes_t(10));
-        this->setModificationTimestampOlderThanAccessTimestamp("/myfile");
+        this->setAtimeNewerThanMtime("/myfile");
         auto openFile = this->OpenFile("/myfile", fspp::num_bytes_t(10));
         auto* openFilePtr = openFile.get();
 
@@ -269,7 +262,7 @@ TYPED_TEST_P(FsppOpenFileTest_Timestamps, givenAtimeNewerThanMtime_read_outofbou
 TYPED_TEST_P(FsppOpenFileTest_Timestamps, givenAtimeOlderThanMtime_read_outofbounds) {
     auto operation = [this] () {
         this->CreateFileWithSize("/myfile", fspp::num_bytes_t(10));
-        this->setModificationTimestampLaterThanAccessTimestamp("/myfile");
+        this->setAtimeOlderThanMtime("/myfile");
         auto openFile = this->OpenFile("/myfile", fspp::num_bytes_t(10));
         auto* openFilePtr = openFile.get();
 

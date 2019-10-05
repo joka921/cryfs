@@ -101,29 +101,27 @@ public:
     EXPECT_NE(nullptr, dynamic_cast<const fspp::Symlink*>(node.get()));
   }
 
-  // TODO Unify names of following three methods
-
-  void setModificationTimestampLaterThanAccessTimestamp(const boost::filesystem::path& path) {
+  void setAtimeOlderThanMtime(const boost::filesystem::path& path) {
     auto node = device->Load(path).value();
     auto st = node->stat();
-    st.mtime.tv_nsec = st.atime.tv_nsec + 1;
+    st.atime.tv_nsec = st.mtime.tv_nsec - 1;
     node->utimens(
             st.atime,
             st.mtime
     );
   }
 
-  void setModificationTimestampOlderThanAccessTimestamp(const boost::filesystem::path& path) {
+  void setAtimeNewerThanMtime(const boost::filesystem::path& path) {
     auto node = device->Load(path).value();
     auto st = node->stat();
-    st.mtime.tv_nsec = st.atime.tv_nsec - 1;
+    st.atime.tv_nsec = st.mtime.tv_nsec + 1;
     node->utimens(
             st.atime,
             st.mtime
     );
   }
 
-  void setAccessTimestampNewerThanMtimeButBeforeYesterday(const boost::filesystem::path& path) {
+  void setAtimeNewerThanMtimeButBeforeYesterday(const boost::filesystem::path& path) {
       auto node = device->Load(path).value();
       auto st = node->stat();
       const timespec now = cpputils::time::now();

@@ -13,7 +13,7 @@ TYPED_TEST_CASE_P(FsppSymlinkTest_Timestamps);
 TYPED_TEST_P(FsppSymlinkTest_Timestamps, givenAtimeNewerThanMtimeButBeforeYesterday_target) {
     auto operation = [this] {
         auto symlink = this->CreateSymlink("/mysymlink");
-        this->setAccessTimestampNewerThanMtimeButBeforeYesterday("/mysymlink");
+        this->setAtimeNewerThanMtimeButBeforeYesterday("/mysymlink");
         return [symlink = std::move(symlink)] {
             symlink->target();
         };
@@ -35,7 +35,7 @@ TYPED_TEST_P(FsppSymlinkTest_Timestamps, givenAtimeNewerThanMtimeButBeforeYester
 TYPED_TEST_P(FsppSymlinkTest_Timestamps, givenAtimeOlderThanMtime_target) {
     auto operation = [this] {
         auto symlink = this->CreateSymlink("/mysymlink");
-        this->setModificationTimestampLaterThanAccessTimestamp("/mysymlink");
+        this->setAtimeOlderThanMtime("/mysymlink");
         return [symlink = std::move(symlink)] {
             symlink->target();
         };
@@ -57,7 +57,7 @@ TYPED_TEST_P(FsppSymlinkTest_Timestamps, givenAtimeOlderThanMtime_target) {
 TYPED_TEST_P(FsppSymlinkTest_Timestamps, givenAtimeNewerThanMtime_target) {
     auto operation = [this] {
         auto symlink = this->CreateSymlink("/mysymlink");
-        this->setModificationTimestampOlderThanAccessTimestamp("/mysymlink");
+        this->setAtimeNewerThanMtime("/mysymlink");
         return [symlink = std::move(symlink)] {
             symlink->target();
         };

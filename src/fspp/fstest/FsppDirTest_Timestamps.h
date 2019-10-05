@@ -131,7 +131,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, createSymlink_TimestampsOfCreatedSymlink) {
 TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeOlderThanMtime_children_empty) {
     auto operation = [this] {
         auto dir = this->CreateDir("/mydir");
-        this->setModificationTimestampLaterThanAccessTimestamp("/mydir");
+        this->setAtimeOlderThanMtime("/mydir");
         return [dir = std::move(dir)] {
             dir->children();
         };
@@ -152,7 +152,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeOlderThanMtime_children_empty) {
 TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeNewerThanMtime_children_empty) {
     auto operation = [this] {
         auto dir = this->CreateDir("/mydir");
-        this->setModificationTimestampOlderThanAccessTimestamp("/mydir");
+        this->setAtimeNewerThanMtime("/mydir");
         return [dir = std::move(dir)] {
             dir->children();
         };
@@ -173,7 +173,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeNewerThanMtime_children_empty) {
 TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeNewerThanMtimeButBeforeYesterday_children_empty) {
     auto operation = [this] {
         auto dir = this->CreateDir("/mydir");
-        this->setAccessTimestampNewerThanMtimeButBeforeYesterday("/mydir");
+        this->setAtimeNewerThanMtimeButBeforeYesterday("/mydir");
         return [dir = std::move(dir)] {
             dir->children();
         };
@@ -195,7 +195,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeNewerThanMtimeButBeforeYesterday_
 TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeOlderThanMtime_children_empty_inRootDir) {
     auto operation = [this] {
         auto dir = this->LoadDir("/");
-        this->setModificationTimestampLaterThanAccessTimestamp("/");
+        this->setAtimeOlderThanMtime("/");
         return [dir = std::move(dir)] {
             dir->children();
         };
@@ -216,7 +216,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeOlderThanMtime_children_empty_inR
 TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeNewerThanMtime_children_empty_inRootDir) {
     auto operation = [this] {
         auto dir = this->LoadDir("/");
-        this->setModificationTimestampOlderThanAccessTimestamp("/");
+        this->setAtimeNewerThanMtime("/");
         return [dir = std::move(dir)] {
             dir->children();
         };
@@ -237,7 +237,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeNewerThanMtime_children_empty_inR
 TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeNewerThanMtimeButBeforeYesterday_children_empty_inRootDir) {
     auto operation = [this] {
         auto dir = this->LoadDir("/");
-        this->setAccessTimestampNewerThanMtimeButBeforeYesterday("/");
+        this->setAtimeNewerThanMtimeButBeforeYesterday("/");
         return [dir = std::move(dir)] {
             dir->children();
         };
@@ -260,7 +260,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeOlderThanMtime_children_nonempty)
     auto operation = [this] {
         auto dir = this->CreateDir("/mydir");
         dir->createAndOpenFile("filename", fspp::mode_t().addFileFlag(), fspp::uid_t(1000), fspp::gid_t(1000));
-        this->setModificationTimestampLaterThanAccessTimestamp("/mydir");
+        this->setAtimeOlderThanMtime("/mydir");
         return [dir = std::move(dir)] {
             dir->children();
         };
@@ -282,7 +282,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeNewerThanMtime_children_nonempty)
     auto operation = [this] {
         auto dir = this->CreateDir("/mydir");
         dir->createAndOpenFile("filename", fspp::mode_t().addFileFlag(), fspp::uid_t(1000), fspp::gid_t(1000));
-        this->setModificationTimestampOlderThanAccessTimestamp("/mydir");
+        this->setAtimeNewerThanMtime("/mydir");
         return [dir = std::move(dir)] {
             dir->children();
         };
@@ -304,7 +304,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeNewerThanMtimeButBeforeYesterday_
     auto operation = [this] {
         auto dir = this->CreateDir("/mydir");
         dir->createAndOpenFile("filename", fspp::mode_t().addFileFlag(), fspp::uid_t(1000), fspp::gid_t(1000));
-        this->setAccessTimestampNewerThanMtimeButBeforeYesterday("/mydir");
+        this->setAtimeNewerThanMtimeButBeforeYesterday("/mydir");
         return [dir = std::move(dir)] {
             dir->children();
         };
@@ -327,7 +327,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeOlderThanMtime_children_nonempty_
     auto operation = [this] {
         auto dir = this->LoadDir("/");
         dir->createAndOpenFile("filename", fspp::mode_t().addFileFlag(), fspp::uid_t(1000), fspp::gid_t(1000));
-        this->setModificationTimestampLaterThanAccessTimestamp("/");
+        this->setAtimeOlderThanMtime("/");
         return [dir = std::move(dir)] {
             dir->children();
         };
@@ -349,7 +349,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeNewerThanMtime_children_nonempty_
     auto operation = [this] {
         auto dir = this->LoadDir("/");
         dir->createAndOpenFile("filename", fspp::mode_t().addFileFlag(), fspp::uid_t(1000), fspp::gid_t(1000));
-        this->setModificationTimestampOlderThanAccessTimestamp("/");
+        this->setAtimeNewerThanMtime("/");
         return [dir = std::move(dir)] {
             dir->children();
         };
@@ -371,7 +371,7 @@ TYPED_TEST_P(FsppDirTest_Timestamps, givenAtimeNewerThanMtimeButBeforeYesterday_
     auto operation = [this] {
         auto dir = this->LoadDir("/");
         dir->createAndOpenFile("filename", fspp::mode_t().addFileFlag(), fspp::uid_t(1000), fspp::gid_t(1000));
-        this->setAccessTimestampNewerThanMtimeButBeforeYesterday("/");
+        this->setAtimeNewerThanMtimeButBeforeYesterday("/");
         return [dir = std::move(dir)] {
             dir->children();
         };
