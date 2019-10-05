@@ -14,8 +14,8 @@ public:
         auto file = this->CreateFile(path);
         file->truncate(size);
         auto openFile = file->open(fspp::openflags_t::RDWR());
-        assert(this->stat(*openFile).size == size);
-        assert(this->stat(*this->Load(path)).size == size);
+        ASSERT(this->stat(*openFile).size == size, "");
+        ASSERT(this->stat(*this->Load(path)).size == size, "");
         return openFile;
     }
     void CreateFileWithSize(const boost::filesystem::path &path, fspp::num_bytes_t size) {
@@ -25,8 +25,8 @@ public:
     cpputils::unique_ref<fspp::OpenFile> OpenFile(const boost::filesystem::path &path, fspp::num_bytes_t size) {
         auto file = this->LoadFile(path);
         auto openFile = file->open(fspp::openflags_t::RDWR());
-        assert(this->stat(*openFile).size == size);
-        assert(this->stat(*this->Load(path)).size == size);
+        ASSERT(this->stat(*openFile).size == size, "");
+        ASSERT(this->stat(*this->Load(path)).size == size, "");
         return openFile;
     }
 };
