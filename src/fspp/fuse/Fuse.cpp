@@ -310,6 +310,9 @@ void Fuse::_run(const bf::path &mountdir, const vector<string> &fuseOptions) {
 }
 
 void Fuse::_createContext(const vector<string> &fuseOptions) {
+    // TODO Test that the right TimestampUpdateBehavior is created with the corresponding flag.
+    // TODO Also test combination of flags with csv separation
+
     const bool has_atime_flag = fuseOptions.end() != std::find(fuseOptions.begin(), fuseOptions.end(), "atime");
     const bool has_noatime_flag = fuseOptions.end() != std::find(fuseOptions.begin(), fuseOptions.end(), "noatime");
     const bool has_relatime_flag = fuseOptions.end() != std::find(fuseOptions.begin(), fuseOptions.end(), "relatime");

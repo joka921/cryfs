@@ -4,8 +4,6 @@
 
 #include "testutils/TimestampTestUtils.h"
 
-// FsppDirTest_Timestamps is split into _1 and _2 because of googletest limitations on number of test cases per
-// type parametrized fixture
 template<class ConcreteFileSystemTestFixture>
 class FsppDirTest_Timestamps: public TimestampTestUtils<ConcreteFileSystemTestFixture> {
 public:
