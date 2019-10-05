@@ -101,6 +101,8 @@ public:
     EXPECT_NE(nullptr, dynamic_cast<const fspp::Symlink*>(node.get()));
   }
 
+  // TODO Unify names of following three methods
+
   void setModificationTimestampLaterThanAccessTimestamp(const boost::filesystem::path& path) {
     auto node = device->Load(path).value();
     auto st = node->stat();
