@@ -11,7 +11,7 @@ class CryDevice;
 
 class CryOpenFile final: public fspp::OpenFile {
 public:
-  explicit CryOpenFile(const CryDevice *device, std::shared_ptr<parallelaccessfsblobstore::DirBlobRef> parent, cpputils::unique_ref<parallelaccessfsblobstore::FileBlobRef> fileBlob, fspp::TimestampUpdateBehavior timestampUpdateBehavior);
+  explicit CryOpenFile(const CryDevice *device, std::shared_ptr<parallelaccessfsblobstore::DirBlobRef> parent, cpputils::unique_ref<parallelaccessfsblobstore::FileBlobRef> fileBlob);
   ~CryOpenFile();
 
   stat_info stat() const override;
@@ -27,7 +27,6 @@ private:
   const CryDevice *_device;
   std::shared_ptr<parallelaccessfsblobstore::DirBlobRef> _parent;
   cpputils::unique_ref<parallelaccessfsblobstore::FileBlobRef> _fileBlob;
-  fspp::TimestampUpdateBehavior _timestampUpdateBehavior;
 
   DISALLOW_COPY_AND_ASSIGN(CryOpenFile);
 };

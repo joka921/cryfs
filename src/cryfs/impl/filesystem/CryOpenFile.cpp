@@ -16,8 +16,8 @@ using cryfs::parallelaccessfsblobstore::DirBlobRef;
 
 namespace cryfs {
 
-CryOpenFile::CryOpenFile(const CryDevice *device, shared_ptr<DirBlobRef> parent, unique_ref<FileBlobRef> fileBlob, fspp::TimestampUpdateBehavior timestampUpdateBehavior)
-: _device(device), _parent(parent), _fileBlob(std::move(fileBlob)), _timestampUpdateBehavior(timestampUpdateBehavior) {
+CryOpenFile::CryOpenFile(const CryDevice *device, shared_ptr<DirBlobRef> parent, unique_ref<FileBlobRef> fileBlob)
+: _device(device), _parent(parent), _fileBlob(std::move(fileBlob)) {
 }
 
 CryOpenFile::~CryOpenFile() {
@@ -65,7 +65,7 @@ void CryOpenFile::fdatasync() {
 }
 
 fspp::TimestampUpdateBehavior CryOpenFile::timestampUpdateBehavior() const {
-  return _timestampUpdateBehavior;
+  return _device->getContext().timestampUpdateBehavior();
 }
 
 }
