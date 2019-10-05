@@ -30,13 +30,20 @@ public:
     "Given test fixture for instantiating the (type parameterized) FileSystemTest must inherit from FileSystemTestFixture"
   );
 
-  FileSystemTest(): fixture(), device(fixture.createDevice()) {
-      // TODO How should timestamp tests set this?
-      device->setContext(fspp::Context{fspp::relatime()});
+  FileSystemTest(): fixture(nullptr), device(nullptr) {
+      resetFilesystem(fspp::Context{fspp::relatime()});
   }
 
-  ConcreteFileSystemTestFixture fixture;
-  cpputils::unique_ref<fspp::Device> device;
+  void resetFilesystem(fspp::Context&& context) {
+      device = nullptr;
+      fixture = nullptr;
+      fixture = std::make_unique<ConcreteFileSystemTestFixture>();
+      device = fixture->createDevice();
+      device->setContext(std::move(context));
+  }
+
+  std::unique_ptr<ConcreteFileSystemTestFixture> fixture;
+  std::unique_ptr<fspp::Device> device;
 
   static constexpr fspp::mode_t MODE_PUBLIC = fspp::mode_t()
         .addUserReadFlag().addUserWriteFlag().addUserExecFlag()
@@ -114,7 +121,7 @@ public:
     );
   }
 
-  void setAccessTimestampBeforeYesterday(const boost::filesystem::path& path) {
+  void setAccessTimestampNewerThanMtimeButBeforeYesterday(const boost::filesystem::path& path) {
       auto node = device->Load(path).value();
       auto st = node->stat();
       const timespec now = cpputils::time::now();

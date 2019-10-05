@@ -24,7 +24,8 @@ public:
         FileSystemTest<ConcreteFileSystemTestFixture>::device->setContext(fspp::Context { timestampUpdateBehavior });
     }
 
-    void EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(std::function<fspp::Node::stat_info()> statOld, std::function<fspp::Node::stat_info()> statNew, std::function<void()> operation, std::initializer_list<TimestampUpdateExpectation> behaviorChecks) {
+    template<class Operation>
+    void EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(std::function<fspp::Node::stat_info()> statOld, std::function<fspp::Node::stat_info()> statNew, Operation&& operation, std::initializer_list<TimestampUpdateExpectation> behaviorChecks) {
         auto oldStat = statOld();
         ensureNodeTimestampsAreOld(oldStat);
         timespec timeBeforeOperation = cpputils::time::now();
@@ -36,26 +37,29 @@ public:
         }
     }
 
-    void EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(const fspp::OpenFile &node, std::function<void()> operation, std::initializer_list<TimestampUpdateExpectation> behaviorChecks) {
+    template<class Operation>
+    void EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(const fspp::OpenFile &node, Operation&& operation, std::initializer_list<TimestampUpdateExpectation> behaviorChecks) {
         EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(
             [this, &node](){return this->stat(node);},
             [this, &node](){return this->stat(node);},
-            operation,
+            std::forward<Operation>(operation),
             behaviorChecks
         );
     }
 
-    void EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(const boost::filesystem::path &oldPath, const boost::filesystem::path &newPath, std::function<void()> operation, std::initializer_list<TimestampUpdateExpectation> behaviorChecks) {
+    template<class Operation>
+    void EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(const boost::filesystem::path &oldPath, const boost::filesystem::path &newPath, Operation&& operation, std::initializer_list<TimestampUpdateExpectation> behaviorChecks) {
         EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(
             [this, oldPath](){return this->stat(*this->Load(oldPath));},
             [this, newPath](){return this->stat(*this->Load(newPath));},
-            operation,
+            std::forward<Operation>(operation),
             behaviorChecks
         );
     }
 
-    void EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(const boost::filesystem::path &path, std::function<void()> operation, std::initializer_list<TimestampUpdateExpectation> behaviorChecks) {
-        EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(path, path, operation, behaviorChecks);
+    template<class Operation>
+    void EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(const boost::filesystem::path &path, Operation&& operation, std::initializer_list<TimestampUpdateExpectation> behaviorChecks) {
+        EXPECT_OPERATION_UPDATES_TIMESTAMPS_AS(path, path, std::forward<Operation>(operation), behaviorChecks);
     }
 
     void EXPECT_ACCESS_TIMESTAMP_BETWEEN(timespec lowerBound, timespec upperBound, const fspp::Node &node) {
@@ -92,6 +96,55 @@ public:
         EXPECT_LT(nodeStat.atime, cpputils::time::now());
         EXPECT_LT(nodeStat.mtime, cpputils::time::now());
         EXPECT_LT(nodeStat.ctime, cpputils::time::now());
+    }
+
+    class TestBuilder final {
+    public:
+        explicit TestBuilder(TimestampTestUtils* fixture): _fixture(fixture) {}
+
+        const TestBuilder& withNoatime(std::function<void()> expectations) const {
+            _fixture->resetFilesystem(fspp::Context {fspp::noatime()});
+            expectations();
+            return *this;
+        }
+
+        const TestBuilder& withStrictatime(std::function<void()> expectations) const {
+            _fixture->resetFilesystem(fspp::Context {fspp::strictatime()});
+            expectations();
+            return *this;
+        }
+
+        const TestBuilder& withRelatime(std::function<void()> expectations) const {
+            _fixture->resetFilesystem(fspp::Context {fspp::relatime()});
+            expectations();
+            return *this;
+        }
+
+        const TestBuilder& withNodiratimeRelatime(std::function<void()> expectations) const {
+            _fixture->resetFilesystem(fspp::Context {fspp::nodiratime_relatime()});
+            expectations();
+            return *this;
+        }
+
+        const TestBuilder& withNodiratimeStrictatime(std::function<void()> expectations) const {
+            _fixture->resetFilesystem(fspp::Context {fspp::nodiratime_strictatime()});
+            expectations();
+            return *this;
+        }
+
+        const TestBuilder& withAnyAtimeConfig(std::function<void()> expectations) const {
+            return withNoatime(expectations)
+                .withStrictatime(expectations)
+                .withRelatime(expectations)
+                .withNodiratimeRelatime(expectations)
+                .withNodiratimeStrictatime(expectations);
+        }
+
+    private:
+        TimestampTestUtils* _fixture;
+    };
+    TestBuilder testBuilder() {
+        return TestBuilder(this);
     }
 
 private:
