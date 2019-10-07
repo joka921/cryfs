@@ -5,3 +5,5 @@ cryptopp: https://github.com/weidai11/cryptopp/tree/CRYPTOPP_8_2_0
  - changed: added CMakeLists.txt and cryptopp-config.cmake from https://github.com/noloader/cryptopp-cmake/tree/CRYPTOPP_8_2_0
  - changed: commented out line including winapifamily.h in CMakeLists.txt
 range-v3: https://github.com/ericniebler/range-v3/tree/0.9.1
+ - changed: use SYSTEM in target_include_directories in CMakeLists.txt to suppress warnings. https://github.com/ericniebler/range-v3/pull/1344
+ - changed: remove the line changing CMAKE_BUILD_TYPE in cmake/ranges_env.cmake. https://github.com/ericniebler/range-v3/pull/1345
