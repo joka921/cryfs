@@ -55,7 +55,7 @@ references:
         sudo chmod o-w /etc/apt/sources.list.d/clang.list
 
         DEBIAN_FRONTEND=noninteractive sudo apt-get update -qq
-        DEBIAN_FRONTEND=noninteractive sudo apt-get install -y git ccache $APT_COMPILER_PACKAGE cmake make libcurl4-openssl-dev libssl-dev libfuse-dev python
+        DEBIAN_FRONTEND=noninteractive sudo apt-get install -y git ccache $APT_COMPILER_PACKAGE make libcurl4-openssl-dev libssl-dev libfuse-dev python
         # Use /dev/urandom when /dev/random is accessed to use less entropy
         sudo cp -a /dev/urandom /dev/random
 
@@ -70,6 +70,21 @@ references:
           sudo apt-get install -y g++-5
           sudo apt-get remove g++-4.8 gcc-4.8
         fi
+
+        # Install cmake
+        echo Updating CMake...
+        wget https://cmake.org/files/v3.6/cmake-3.6.3-Linux-x86_64.tar.gz
+        tar -xf cmake-3.6.3-Linux-x86_64.tar.gz
+        if [ $(sha256sum cmake-3.6.3-Linux-x86_64.tar.gz | awk '{print $1;}') == "9d915d505c07d84b610e1be6242c7cad68b4b7a4090ce85ecf9cec5effa47c43" ]; then
+          echo Correct sha256sum
+        else
+          echo Wrong sha256sum
+          sha512sum cmake-3.6.3-Linux-x86_64.tar.gz
+          exit 1
+        fi
+        sudo cp -R cmake-3.6.3-Linux-x86_64/* /usr
+        rm -rf cmake-3.6.3-Linux-x86_64.tar.gz cmake-3.6.3-Linux-x86_64
+        echo Updating CMake...done
 
         # Setup ccache
         sudo ln -s /usr/bin/ccache /usr/local/bin/$CC
