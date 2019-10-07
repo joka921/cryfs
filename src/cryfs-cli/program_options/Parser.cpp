@@ -82,7 +82,6 @@ ProgramOptions Parser::parse(const vector<string> &supportedCiphers) const {
         missingBlockIsIntegrityViolation = vm["missing-block-is-integrity-violation"].as<bool>();
     }
 
-    // TODO fuse options must be split at a comma!
     if (vm.count("fuse-option")) {
         auto options = vm["fuse-option"].as<vector<string>>();
         for (const auto& option: options) {
